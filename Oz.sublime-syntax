@@ -21,7 +21,7 @@ contexts:
       push: line_comment
 
     # Proc Declarations
-    - match: '\b(fun|proc)\b\s+\{(\w+)((?:\s\w+)*)\}'
+    - match: '\b(fun|proc)\b\s+\{([\$\w]+)((?:\s\w+)*)\}'
       name: meta.function.oz
       captures:
         1: keyword.control.proc.oz
