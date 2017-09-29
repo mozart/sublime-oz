@@ -1,0 +1,87 @@
+%YAML 1.2
+---
+name: Oz
+file_extensions: [oz]
+scope: source.oz
+contexts:
+  main:
+    # Double-quoted String
+    - match: '"'
+      scope: punctuation.definition.string.begin.oz
+      push: double_quoted_string
+
+    # Multi-line Comment
+    - match: '/\*'
+      scope: comment.block.documentation.oz
+      push: multiline_comment
+
+    # Line Comment
+    - match: '%'
+      scope: punctuation.definition.comment.oz
+      push: line_comment
+
+    # Proc Declarations
+    - match: '\b(fun|proc)\b\s+\{(\w+)((?:\s\w+)*)\}'
+      name: meta.function.oz
+      captures:
+        1: keyword.control.proc.oz
+        2: entity.name.function.oz
+        3: variable.parameter.function.oz
+
+    # Keywords
+    - match: '\b(andthen|at|attr|case|catch|class|choice|cond|declare|define|do|dis|else|elsecase|elseif|end|export|feat|finally|for|from|fun|functor|if|in|import|lex|local|lock|meth|mode|not|of|or|orelse|parser|prepare|proc|prod|prop|raise|require|scanner|skip|suchthat|syn|then|thread|token|try)\b'
+      scope: keyword.control.oz
+
+    # Language Constants
+    - match: '\b(nil|true|false)\b'
+      scope: keyword.constant.oz
+
+    # Numbers
+    - match: '\b[+-]?\d+(\.\d+)?\b'
+      scope: constant.numeric.oz
+
+    # Read-write Cells
+    - match: '(@)[A-Z]\w*'
+      name: variable.other.readwrite.cell.oz
+
+    # Assignment Operator
+    - match: '=|:='
+      scope: keyword.operator.assignement.oz
+
+    # Comparison Operators
+    - match: '<|=<|==|\\=|>=|>'
+      scope: keyword.operator.comparison.oz
+
+    # Math Operators
+    - match: '(\*|\+|\-|/|~)|\b(div|mod)\b'
+      scope: keyword.operator.arithmetic.oz
+
+    # Virtual String Operator
+    - match: '#'
+      scope: keyword.operator.string.virtual.oz
+
+    # Cons Operator
+    - match: '\b\|\b'
+      scope: keyword.operator.list.oz
+
+    # Array Brackets
+    - match: '\[|\]'
+      name: punctuation.section.array.oz
+
+  double_quoted_string:
+    - meta_scope: string.quoted.double.oz
+    - match: '\\.'
+      scope: constant.character.escape.oz
+    - match: '"'
+      scope: punctuation.definition.string.end.oz
+      pop: true
+
+  multiline_comment:
+    - meta_scope: comment.multiline.oz
+    - match: '\*/'
+      pop: true
+
+  line_comment:
+    - meta_scope: comment.line.oz
+    - match: '$\n?'
+      pop: true
