@@ -20,6 +20,11 @@ contexts:
       scope: punctuation.definition.comment.oz
       push: line_comment
 
+    # Import Declarations
+    - match: '\bimport\b'
+      scope: keyword.control.oz
+      push: import_block
+
     # Proc Declarations
     - match: '\b(fun|proc)\b\s+\{([\$\w]+)((?:\s\w+)*)\}'
       name: meta.function.oz
@@ -27,6 +32,10 @@ contexts:
         1: keyword.control.proc.oz
         2: entity.name.function.oz
         3: variable.parameter.function.oz
+
+    # Proc Applications
+    - match: '\{'
+      push: proc_application
 
     # Keywords
     - match: '\b(andthen|at|attr|case|catch|class|choice|cond|declare|define|do|dis|else|elsecase|elseif|end|export|feat|finally|for|from|fun|functor|if|in|import|lex|local|lock|meth|mode|not|of|or|orelse|parser|prepare|proc|prod|prop|raise|require|scanner|skip|suchthat|syn|then|thread|token|try)\b'
@@ -85,3 +94,20 @@ contexts:
     - meta_scope: comment.line.oz
     - match: '$\n?'
       pop: true
+
+  proc_application:
+    - meta_scope: meta.function.oz
+    - match: '\w+\.'
+      scope: entity.name.section.oz
+    - match: '\w+'
+      scope: entity.name.function.oz
+      pop: true
+    - match: '.*'
+      pop: true
+
+  import_block:
+    - match: '\bdefine\b'
+      scope: keyword.control.oz
+      pop: true
+    - match: '\w+'
+      scope: entity.name.section.oz
