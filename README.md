@@ -5,10 +5,11 @@
 ## Features
 
   * Syntax Highlighting - detects files matching the pattern `*.oz`.
+  * Comments - Applies Oz-style single line (%) comments using standard commands/shortcuts.
 
 ## Automatic Installation
 
-**(Pending PR Acceptance)** Sublime/Oz is available from [Package Control](https://packagecontrol.io/packages/Oz) under the name `Oz`.
+Sublime/Oz is available from [Package Control](https://packagecontrol.io/packages/Oz) under the name `Oz`.
 
 ## Manual Installation
 
@@ -16,7 +17,7 @@ Download this repo as an archive or `git clone` it under the `Packages` director
 
 On Windows, this is something like `C:\Users\%USER_NAME%\AppData\Roaming\Sublime Text 3\Packages`.
 
-Once the `sublime-shen` package is in place, just restart Sublime, and it should be ready to go.
+Once the `sublime-oz` package is in place, just restart Sublime, and it should be ready to go.
 
 ## Future Work
 
