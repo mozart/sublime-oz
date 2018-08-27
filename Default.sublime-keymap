@@ -1,0 +1,3 @@
+[
+	{ "keys": ["ctrl+b", "b"], "command": "oz_run"}
+]
