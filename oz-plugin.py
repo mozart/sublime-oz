@@ -20,7 +20,7 @@ def execute_mozart(file):
     errs = stderr.decode('utf-8')
     return [outs, errs]
 
-class OzRunCommand(sublime_plugin.TextCommand):
+class OzCompileCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         file = self.view.file_name()
         co = compile_mozart(file)
