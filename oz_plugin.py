@@ -6,15 +6,24 @@ import threading
 
 oz_proc = None
 
+def get_socket(s):
+    sp_s = str.split(s)
+    return sp_s[1]
+
+
 class SubOz(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = True
         self.process = None
+        self.socket = None
 
     def run(self):
         self.process = Popen(['ozengine', 'x-oz://system/OPI.ozf'], stdout=PIPE, stderr=PIPE)
         print("ozengine pid : %s", self.process.pid)
+        socket_output = self.process.stdout.readline().decode('utf-8')
+        self.socket = get_socket(socket_output)
+        print("Oz Socket : %s" % self.socket)
         while self.running:
             output = self.process.stdout.readline()
             outerr= self.process.stderr.readline()
