@@ -5,11 +5,11 @@ import sublime_plugin
 import threading
 from User.socket_pipe import SocketPipe
 oz_proc = None
+sp = None
 
 def get_socket(s):
     sp_s = str.split(s)
-    return sp_s[1]
-
+    return int(sp_s[1])
 
 class SubOz(threading.Thread):
     def __init__(self):
@@ -38,3 +38,6 @@ class OzRunCommand(sublime_plugin.TextCommand):
         global oz_proc
         oz_proc = SubOz()
         oz_proc.start()
+        global sp
+        sp = SocketPipe(self.view, oz_proc.socket)
+        sp.start()
