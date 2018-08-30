@@ -8,6 +8,7 @@
 import threading
 import socket
 import sublime, sublime_plugin
+import re
 
 class SocketPipe(threading.Thread):
     def __init__(self, view, port):
@@ -19,8 +20,9 @@ class SocketPipe(threading.Thread):
         self.prompt = 0
         self.history = []
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect('localhost', port)
+        self.sock.connect(('localhost', port))
         self.sock.settimeout(1)
+        self.running = True
         print("Connected SocketPipe to port : %s" % (port))
 
     def go(self):
@@ -73,6 +75,7 @@ class SocketPipe(threading.Thread):
             self.hist = 0
 
     def send(self, s):
+        print("sending: %s" % s)
         self.record_history(s)
         self.sock.send(s.encode('utf-8'))
 
