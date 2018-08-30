@@ -3,7 +3,7 @@ from subprocess import PIPE, Popen
 import sublime
 import sublime_plugin
 import threading
-
+from User.socket_pipe import SocketPipe
 oz_proc = None
 
 def get_socket(s):
@@ -17,13 +17,13 @@ class SubOz(threading.Thread):
         self.running = True
         self.process = None
         self.socket = None
-
-    def run(self):
         self.process = Popen(['ozengine', 'x-oz://system/OPI.ozf'], stdout=PIPE, stderr=PIPE)
         print("ozengine pid : %s", self.process.pid)
         socket_output = self.process.stdout.readline().decode('utf-8')
         self.socket = get_socket(socket_output)
         print("Oz Socket : %s" % self.socket)
+
+    def run(self):
         while self.running:
             output = self.process.stdout.readline()
             outerr= self.process.stderr.readline()
