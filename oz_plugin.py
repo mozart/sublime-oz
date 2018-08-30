@@ -41,3 +41,10 @@ class OzRunCommand(sublime_plugin.TextCommand):
         global sp
         sp = SocketPipe(self.view, oz_proc.socket)
         sp.start()
+
+class OzFeedBufferCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        global sp
+        msg = self.view.substr(sublime.Region(0, self.view.size()))
+        msg = msg + "\n\004\n"
+        sp.send(msg)
