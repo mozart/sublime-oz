@@ -4,6 +4,7 @@ import sublime
 import sublime_plugin
 import threading
 from User.socket_pipe import SocketPipe
+
 oz_proc = None
 sp = None
 
