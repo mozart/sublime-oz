@@ -32,7 +32,7 @@ class SubOz(threading.Thread):
             output = self.process.stdout.readline()
             outerr= self.process.stderr.readline()
             if output == '' and outerr == '' and self.process.poll() is not None:
-                running = False
+                self.running = False
             else:
                 print(output.decode('utf-8'))
                 print(outerr.decode('utf-8'))
