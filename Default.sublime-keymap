@@ -1,4 +1,5 @@
 [
 	{ "keys": ["ctrl+keypad_period", "ctrl+r"], "command": "oz_run"},
 	{ "keys": ["ctrl+keypad_period", "ctrl+b"], "command": "oz_feed_buffer"}
+	{ "keys": ["ctrl+keypad_period", "ctrl+k"], "command": "oz_kill"}
 ]
