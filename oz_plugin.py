@@ -12,6 +12,9 @@ def get_socket(s):
     sp_s = str.split(s)
     return int(sp_s[1])
 
+def kill_oz(sock):
+    sock.send("{Application.exit 0}\n\004\n\n}")
+
 class SubOz(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -49,3 +52,8 @@ class OzFeedBufferCommand(sublime_plugin.TextCommand):
         msg = self.view.substr(sublime.Region(0, self.view.size()))
         msg = msg + "\n\004\n"
         sp.send(msg)
+
+class OzKillCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        global sp
+        kill_oz(sp)
