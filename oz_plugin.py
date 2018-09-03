@@ -25,6 +25,16 @@ class OzRunCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pass
 
+class OzFeedRegion(sublime_plugin.TextCommand):
+    @with_oz
+    def run(self, edit):
+        global sp
+        msg = ""
+        for region in self.view.sel():
+            if not region.empty():
+                msg += self.view.substr(region)
+        sp.send(msg)
+
 class OzFeedLine(sublime_plugin.TextCommand):
     @with_oz
     def run(self, edit):
