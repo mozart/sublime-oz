@@ -83,6 +83,9 @@ class OzThread(threading.Thread):
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
         self.process.wait()
+        panel = self.window.find_output_panel("oz_panel")
+        if panel is not None:
+            self.window.destroy_output_panel("oz_panel")
 
     def stop(self):
         exit_msg = "{Application.exit 0}\n\004\n\n"
