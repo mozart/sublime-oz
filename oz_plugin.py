@@ -7,34 +7,47 @@ from .socket_pipe import OzThread
 
 sp = None
 
-def kill_oz(sock):
-    sock.send("{Application.exit 0}\n\004\n\n}")
+def with_oz(f):
+    def wrapper(*args, **kwargs):
+        global sp
+        if not sp:
+            start_oz()
+        f(*args, **kwargs)
+    return wrapper
 
 def start_oz():
     global sp
-    #Panel to display compilation and emulator output
-    window = sublime.active_window()
-    panel = window.find_output_panel('oz_panel')
-    if(panel == None):
-        panel = window.create_output_panel('oz_panel')
-    window.run_command('show_panel', {'panel':'output.oz_panel'})
-    sp = OzThread(panel)
+    sp = OzThread()
     sp.start()
 
 class OzRunCommand(sublime_plugin.TextCommand):
+    @with_oz
     def run(self, edit):
-        start_oz()
+        pass
 
-class OzFeedBufferCommand(sublime_plugin.TextCommand):
+class OzFeedLine(sublime_plugin.TextCommand):
+    @with_oz
     def run(self, edit):
         global sp
-        if(sp == None):
-            start_oz()
+        msg = ""
+        for region in self.view.sel():
+            if region.empty:
+                line = self.view.line(region)
+                msg += self.view.substr(line) + '\n'
+        sp.send(msg)
+
+class OzFeedBufferCommand(sublime_plugin.TextCommand):
+    @with_oz
+    def run(self, edit):
+        global sp
         msg = self.view.substr(sublime.Region(0, self.view.size()))
-        msg = msg + "\n\004\n"
         sp.send(msg)
 
 class OzKillCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global sp
-        kill_oz(sp)
+        if sp:
+            sp.send("{Application.exit 0}\n\004\n\n")
+            #TODO
+            #Close the process/socket
+        sp = None

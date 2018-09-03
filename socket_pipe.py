@@ -10,7 +10,7 @@ import threading
 import socket
 import sublime, sublime_plugin
 import re
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, STDOUT
 import select
 
 #The first message from ozengine contains the port on which it opened the
@@ -21,33 +21,35 @@ def get_port(s):
 
 #Thread that runs that connects the socket and runs ozengine
 class OzThread(threading.Thread):
-    def __init__(self, view):
+    def __init__(self):
         threading.Thread.__init__(self)
-        self.view = view
+        self.window = sublime.active_window()
 
         #ozemulator
         self.process = Popen(['ozengine', 'x-oz://system/OPI.ozf'], stdout=PIPE, stderr=PIPE)
-        print("ozengine pid : %s", self.process.pid)
         port_output = self.process.stdout.readline().decode('utf-8')
         port = get_port(port_output)
-        print("Oz Socket : %s" % port)
 
         #socket
-        self.history = []
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect(('localhost', port))
         self.sock.settimeout(1)
         self.running = True
 
-    def go(self):
-        self.setup_view()
-        self.start()
+    def write_compiler(self, s):
+        #Panel to display compilation and emulator output
+        panel = self.window.find_output_panel('oz_panel')
+        if not panel:
+            panel = self.window.create_output_panel('oz_panel')
+#        panel.settings().set("scope_name", "source.clojure")
+        panel.settings().set("line_numbers", False)
+#        panel.settings().set("gutter", False)
+        panel.settings().set("word_wrap", False)
 
-    def setup_view(self):
-        self.view.settings().set("scope_name", "source.clojure")
-        self.view.settings().set("line_numbers", False)
-        self.view.settings().set("gutter", False)
-        self.view.settings().set("word_wrap", False)
+        self.window.run_command('show_panel', {'panel':'output.oz_panel'})
+        panel.set_read_only(False)
+        panel.run_command("append", {"characters": s})
+        panel.set_read_only(True)
 
     def on_close(self):
         self.running = False
@@ -58,13 +60,8 @@ class OzThread(threading.Thread):
             pass
 
     def send(self, s):
+        s += "\n\004\n"
         self.sock.send(s.encode('utf-8'))
-
-
-    def insert_text(self, s):
-        self.view.set_read_only(False)
-        self.view.run_command("append", {"characters": s})
-        self.view.set_read_only(True)
 
     def run(self):
         inputs = [self.sock, self.process.stdout, self.process.stderr]
@@ -75,10 +72,10 @@ class OzThread(threading.Thread):
                     try:
                         read = self.sock.recv(8012)
                         read = read.decode('utf-8')
-                        self.insert_text(read)
+                        self.write_compiler(read)
                     except socket.timeout as e:
                         continue
                     except socket.error as e:
                         print(e)
                 else:
-                   self.insert_text(s.readline().decode('utf-8'))
+                   self.write_compiler(s.readline().decode('utf-8'))
