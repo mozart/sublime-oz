@@ -37,19 +37,29 @@ class OzThread(threading.Thread):
         self.running = True
 
     def write_compiler(self, s):
-        #Panel to display compilation and emulator output
-        panel = self.window.find_output_panel('oz_panel')
-        if not panel:
-            panel = self.window.create_output_panel('oz_panel')
-#        panel.settings().set("scope_name", "source.clojure")
-        panel.settings().set("line_numbers", False)
-#        panel.settings().set("gutter", False)
-        panel.settings().set("word_wrap", False)
+        self.write_panel(s, "oz_compiler")
 
-        self.window.run_command('show_panel', {'panel':'output.oz_panel'})
-        panel.set_read_only(False)
-        panel.run_command("append", {"characters": s})
-        panel.set_read_only(True)
+    def write_process(self, s):
+        self.write_panel(s, "oz_output")
+
+    def write_panel(self, s, panel_name):
+        #Panel to display compilation and emulator output
+        panel = self.window.find_output_panel(panel_name)
+        if not panel:
+            panel = self.window.create_output_panel(panel_name)
+            #panel.settings().set("scope_name", "source.clojure")
+            panel.settings().set("line_numbers", False)
+            panel.settings().set("gutter", False)
+            panel.settings().set("word_wrap", False)
+            panel.set_read_only(True)
+
+        panel.run_command("append", {
+            'characters': s,
+            'force': True,
+            'scroll_to_end': True,
+            })
+        self.window.run_command('show_panel', {'panel': 'output.'+panel_name})
+
 
     def on_close(self):
         self.running = False
@@ -69,17 +79,16 @@ class OzThread(threading.Thread):
             [readable, writable, exceptional] = select.select(inputs, [], [],
             10)
             for s in readable:
-                if(s is self.sock):
+                if s is self.sock:
                     try:
-                        read = self.sock.recv(8012)
-                        read = read.decode('utf-8')
-                        self.write_compiler(read)
+                        self.write_compiler(s.recv(8012).decode('utf-8'))
                     except socket.timeout as e:
                         continue
                     except socket.error as e:
                         print(e)
                 else:
-                   self.write_compiler(s.readline().decode('utf-8'))
+                    self.write_process(s.readline().decode('utf-8'))
+
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
         self.process.wait()
