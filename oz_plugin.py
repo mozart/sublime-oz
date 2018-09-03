@@ -3,47 +3,23 @@ from subprocess import PIPE, Popen
 import sublime
 import sublime_plugin
 import threading
-from User.socket_pipe import SocketPipe
+from .socket_pipe import OzThread
 
-oz_proc = None
 sp = None
-
-def get_socket(s):
-    sp_s = str.split(s)
-    return int(sp_s[1])
 
 def kill_oz(sock):
     sock.send("{Application.exit 0}\n\004\n\n}")
 
-class SubOz(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.running = True
-        self.process = None
-        self.socket = None
-        self.process = Popen(['ozengine', 'x-oz://system/OPI.ozf'], stdout=PIPE, stderr=PIPE)
-        print("ozengine pid : %s", self.process.pid)
-        socket_output = self.process.stdout.readline().decode('utf-8')
-        self.socket = get_socket(socket_output)
-        print("Oz Socket : %s" % self.socket)
-
-    def run(self):
-        while self.running:
-            output = self.process.stdout.readline()
-            outerr= self.process.stderr.readline()
-            if output == '' and outerr == '' and self.process.poll() is not None:
-                self.running = False
-            else:
-                print(output.decode('utf-8'))
-                print(outerr.decode('utf-8'))
-
 class OzRunCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        global oz_proc
-        oz_proc = SubOz()
-        oz_proc.start()
         global sp
-        sp = SocketPipe(self.view, oz_proc.socket)
+        #Panel to display compilation and emulator output
+        window = sublime.active_window()
+        panel = window.find_output_panel('oz_panel')
+        if(panel == None):
+            panel = window.create_output_panel('oz_panel')
+        window.run_command('show_panel', {'panel':'output.oz_panel'})
+        sp = OzThread(panel)
         sp.start()
 
 class OzFeedBufferCommand(sublime_plugin.TextCommand):

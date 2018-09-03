@@ -1,3 +1,4 @@
+# Inspired from
 # Copyright :
 # Ramsey Nasser 2016. Provided under the MIT License
 # see https://github.com/nassar/Socket
@@ -9,25 +10,37 @@ import threading
 import socket
 import sublime, sublime_plugin
 import re
+from subprocess import PIPE, Popen
+import select
 
-class SocketPipe(threading.Thread):
-    def __init__(self, view, port):
+#The first message from ozengine contains the port on which it opened the
+#socket. The format of the message is "oz-socket XXXX XXXX"
+def get_port(s):
+    sp_s = str.split(s)
+    return int(sp_s[1])
+
+#Thread that runs that connects the socket and runs ozengine
+class OzThread(threading.Thread):
+    def __init__(self, view):
         threading.Thread.__init__(self)
-        self.runnning = True
         self.view = view
-        self.writtent_characters = 0
-        self.buffer = []
-        self.prompt = 0
+
+        #ozemulator
+        self.process = Popen(['ozengine', 'x-oz://system/OPI.ozf'], stdout=PIPE, stderr=PIPE)
+        print("ozengine pid : %s", self.process.pid)
+        port_output = self.process.stdout.readline().decode('utf-8')
+        port = get_port(port_output)
+        print("Oz Socket : %s" % port)
+
+        #socket
         self.history = []
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect(('localhost', port))
         self.sock.settimeout(1)
         self.running = True
-        print("Connected SocketPipe to port : %s" % (port))
 
     def go(self):
         self.setup_view()
-        self.update_view()
         self.start()
 
     def setup_view(self):
@@ -36,64 +49,36 @@ class SocketPipe(threading.Thread):
         self.view.settings().set("gutter", False)
         self.view.settings().set("word_wrap", False)
 
-    def update_view(self):
-         # prevent editing repl view if a selection is before the prompt
-        oob = False
-        self.view.settings().set("noback", False)
-        for region in self.view.sel():
-            # backspace is a special case, a sublime-keymap binding checks the 'noback' setting
-            if region.a == self.prompt and region.b == region.a:
-                self.view.settings().set("noback", True)
-            if region.a < self.prompt or region.b < self.prompt:
-                oob = True
-        if oob:
-            self.view.set_read_only(True)
-        else:
-            self.view.set_read_only(False)
-        for b in self.buffer:
-            self.view.run_command("socket_insert_text", {"content": b})
-        self.buffer = []
-        if self.running:
-            sublime.set_timeout(self.update_view, 100)
-
     def on_close(self):
         self.running = False
-        self.view.set_name(self.view.name() + " [CLOSED]")
         try:
             self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
         except:
             pass
 
-    def record_history(self, s):
-        rx = re.search("[\\n]*$", s)
-        if rx:
-            s = s[:len(rx.group()) * -1]
-        hlen = len(self.history)
-        if s != "" and (hlen == 0 or (hlen > 0 and s != self.history[hlen-1])):
-            self.history.append(s)
-            self.hist = 0
-
     def send(self, s):
-        print("sending: %s" % s)
-        self.record_history(s)
         self.sock.send(s.encode('utf-8'))
 
-    def write(self, s):
-        self.buffer.append(s)
 
-    def bump(self, s):
-        self.written_characters += len(s)
+    def insert_text(self, s):
+        self.view.set_read_only(False)
+        self.view.run_command("append", {"characters": s})
+        self.view.set_read_only(True)
 
     def run(self):
+        inputs = [self.sock, self.process.stdout, self.process.stderr]
         while self.running:
-            try:
-                read = self.sock.recv(8012)
-                if(len(read) == 0):
-                    self.on_close()
+            [readable, writable, exceptional] = select.select(inputs, [], [])
+            for s in readable:
+                if(s is self.sock):
+                    try:
+                        read = self.sock.recv(8012)
+                        read = read.decode('utf-8')
+                        self.insert_text(read)
+                    except socket.timeout as e:
+                        continue
+                    except socket.error as e:
+                        print(e)
                 else:
-                    self.buffer.append(read.decode('utf8'))
-            except socket.timeout as e:
-                continue
-            except socket.error as e:
-                print(e)
+                   self.insert_text(s.readline().decode('utf-8'))
