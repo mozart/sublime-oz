@@ -6,18 +6,26 @@ It is however still in work. Particularly killing subprocesses is still not
 correctly implemented and not automatic.
 
 ## Usage
-The main feature that needs input from the user is feed buffer.
-In order to do so, you should first start the _ozengine_ subprocess.
-Just press **Ctrl-. + Ctrl-s**. Then at any time, you can press **Ctrl-. +
-Ctrl-b** to feed the buffer. Please note that once you started the engine
-subprocess you will need to kill it even after closing Sublime Text. In Unix
-like systems, you can run _pkill ozengine ozemulator ozwish_ to make sure you
-cleaned everything after closing Sublime Text.
+The main feature that needs input from the user is feed like commands
+When you feed something, it should automatically start *ozengine* subprocess.
+The default shortcuts are the following :
+
+ * Feed Line : **Ctrl-. + Ctrl-l**
+ * Feed Region : **Ctrl-. + Ctrl-r**
+ * Feed Buffer : **Ctrl-. + Ctrl-b**
+ * Kill oz : **Ctrl-. + Ctrl-k**
+
+Please note that once you started the ozengine
+subprocess you will need to kill it manually.
 
 ## Features
 
   * Syntax Highlighting - detects files matching the pattern `*.oz`.
   * Comments - Applies Oz-style single line (%) comments using standard commands/shortcuts.
+  * Feed Line - Feed the current line, compile and execute it within ozengine
+as in the classic OPI
+  * Feed Region - Feed the current region, compile and execute it within
+ozengine as in the classic OPI
   * Feed Buffer - Feed the current buffer, compile and execute it within ozengine as in the classic OPI
 
 ## Automatic Installation
