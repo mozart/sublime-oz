@@ -3,5 +3,5 @@
 	{ "keys": ["ctrl+keypad_period", "ctrl+l"], "command": "oz_feed_line"},
 	{ "keys": ["ctrl+keypad_period", "ctrl+r"], "command": "oz_feed_region"},
 	{ "keys": ["ctrl+keypad_period", "ctrl+b"], "command": "oz_feed_buffer"},
-	{ "keys": ["ctrl+keypad_period", "ctrl+k"], "command": "oz_kill"}
+	{ "keys": ["ctrl+keypad_period", "h"], "command": "oz_kill"}
 ]
