@@ -36,6 +36,15 @@ class OzThread(threading.Thread):
         self.sock.settimeout(1)
         self.running = True
 
+        self.clear_panel('oz_compiler')
+        self.clear_panel('oz_output')
+
+
+    def clear_panel(self, panel_name):
+        panel = self.window.find_output_panel(panel_name)
+        if panel:
+            self.window.destroy_output_panel(panel_name)
+
     def write_compiler(self, s):
         self.write_panel(s, "oz_compiler")
 
@@ -92,9 +101,6 @@ class OzThread(threading.Thread):
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
         self.process.wait()
-        panel = self.window.find_output_panel("oz_panel")
-        if panel is not None:
-            self.window.destroy_output_panel("oz_panel")
 
     def stop(self):
         exit_msg = "{Application.exit 0}\n\004\n\n"
