@@ -68,7 +68,9 @@ class OzThread(threading.Thread):
             'force': True,
             'scroll_to_end': True,
             })
-        self.window.run_command('show_panel', {'panel': 'output.'+panel_name})
+        self.window.run_command('show_panel', {
+            'panel': 'output.%s' % panel_name
+            })
 
 
     def on_close(self):
@@ -104,7 +106,9 @@ class OzThread(threading.Thread):
 
         self.send('{Application.exit 0}')
         self.sock.close()
-        self.process.wait()
+
+        ret = self.process.wait()
+        self.write_process("Mozart Engine exited with value %d." % ret)
 
     def stop(self):
         self.stop_condition.set()
