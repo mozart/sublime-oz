@@ -72,15 +72,6 @@ class OzThread(threading.Thread):
             'panel': 'output.%s' % panel_name
             })
 
-
-    def on_close(self):
-        self.running = False
-        try:
-            self.sock.shutdown(socket.SHUT_RDWR)
-            self.sock.close()
-        except:
-            pass
-
     def send(self, s):
         s += "\n\004\n"
         self.sock.send(s.encode('utf-8'))
@@ -98,9 +89,9 @@ class OzThread(threading.Thread):
                     try:
                         self.write_compiler(s.recv(8012).decode('utf-8'))
                     except socket.timeout as e:
-                        continue
+                        self.write_compiler(repr(e))
                     except socket.error as e:
-                        print(e)
+                        self.write_compiler(repr(e))
                 else:
                     self.write_process(s.readline().decode('utf-8'))
 
