@@ -12,6 +12,7 @@ import sublime, sublime_plugin
 import re
 from subprocess import PIPE, Popen, STDOUT
 import select
+import os
 
 #The first message from ozengine contains the port on which it opened the
 #socket. The format of the message is "oz-socket XXXX XXXX"
@@ -34,7 +35,7 @@ class OzThread(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect(('localhost', port))
         self.sock.settimeout(1)
-        self.running = True
+        self.stop_condition = WaitableEvent()
 
         self.clear_panel('oz_compiler')
         self.clear_panel('oz_output')
@@ -83,10 +84,13 @@ class OzThread(threading.Thread):
         self.sock.send(s.encode('utf-8'))
 
     def run(self):
-        inputs = [self.sock, self.process.stdout, self.process.stderr]
-        while self.running:
-            [readable, writable, exceptional] = select.select(inputs, [], [],
-            10)
+        inputs = [self.sock, self.process.stdout, self.process.stderr, self.stop_condition]
+        while True:
+            readable = select.select(inputs, [], [])[0]
+
+            if self.stop_condition.isSet():
+                break
+
             for s in readable:
                 if s is self.sock:
                     try:
@@ -98,11 +102,41 @@ class OzThread(threading.Thread):
                 else:
                     self.write_process(s.readline().decode('utf-8'))
 
-        self.sock.shutdown(socket.SHUT_RDWR)
+        self.send('{Application.exit 0}')
         self.sock.close()
         self.process.wait()
 
     def stop(self):
-        exit_msg = "{Application.exit 0}\n\004\n\n"
-        self.sock.send(exit_msg.encode('utf-8'))
-        self.running = False
+        self.stop_condition.set()
+
+
+class WaitableEvent:
+    """Provides an abstract object that can be used to resume select loops with
+    indefinite waits from another thread or process. This mimics the standard
+    threading.Event interface."""
+    def __init__(self):
+        self._read_fd, self._write_fd = os.pipe()
+
+    def wait(self, timeout=None):
+        rfds, wfds, efds = select.select([self._read_fd], [], [], timeout)
+        return self._read_fd in rfds
+
+    def isSet(self):
+        return self.wait(0)
+
+    def clear(self):
+        if self.isSet():
+            os.read(self._read_fd, 1)
+
+    def set(self):
+        if not self.isSet():
+            os.write(self._write_fd, bytes('1', 'utf-8'))
+
+    def fileno(self):
+        """Return the FD number of the read side of the pipe, allows this object to
+        be used with select.select()."""
+        return self._read_fd
+
+    def __del__(self):
+        os.close(self._read_fd)
+        os.close(self._write_fd)
