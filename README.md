@@ -6,27 +6,25 @@ It is however still in work. Particularly killing subprocesses is still not
 correctly implemented and not automatic.
 
 ## Usage
-The main feature that needs input from the user is feed like commands
-When you feed something, it should automatically start *ozengine* subprocess.
-The default shortcuts are the following :
+
+To evaluate some code, you need to feed it to the Oz compiler.
+This can be done from the "Oz" menu, from the context menu or with the following shortcuts.
 
  * Feed Line : **Ctrl-. + Ctrl-l**
- * Feed Region : **Ctrl-. + Ctrl-r**
- * Feed Buffer : **Ctrl-. + Ctrl-b**
- * Kill oz : **Ctrl-. + Ctrl-k**
+ * Feed Region (selected text): **Ctrl-. + Ctrl-r**
+ * Feed Buffer (the whole file): **Ctrl-. + Ctrl-b**
 
-Please note that once you started the ozengine
-subprocess you will need to kill it manually.
+It may be useful to kill the running compiler. This is also available in the "Oz" menu, or with a shortcut.
+The compiler will be restarted automatically on the next feed command.
+
+ * Kill oz : **Ctrl-. + h**
+
 
 ## Features
 
+  * OPI Integration - Submit current line/selection/file to the Oz compiler (as with the Emacs OPI).
   * Syntax Highlighting - detects files matching the pattern `*.oz`.
-  * Comments - Applies Oz-style single line (%) comments using standard commands/shortcuts.
-  * Feed Line - Feed the current line, compile and execute it within ozengine
-as in the classic OPI
-  * Feed Region - Feed the current region, compile and execute it within
-ozengine as in the classic OPI
-  * Feed Buffer - Feed the current buffer, compile and execute it within ozengine as in the classic OPI
+  * Comments - Comment/Uncomment Oz code using standard commands/shortcuts.
 
 ## Automatic Installation
 
@@ -44,25 +42,10 @@ On linux, this is something like `/home/user/.config/sublime-text-3`
 
 Once the `sublime-oz` package is in place, just restart Sublime, and it should be ready to go.
 
-## OPI
-
-The Oz Programming Interface is started with the plugin command _view.run\_run\_command(oz\_run)_.
-This command calls _ozengine x-oz://system/OPI.ozf_.
-This creates two sockets to communicate with the process.
-The first one, allows to give instruction to the compiler and the second one is used for special instruction, for example start the debugger.
-We connect to the first one using [socket\_pipe.py](socket\_pype.py).
-Please note that this file is a simple modification of pre-existing Class from this [repository](https://github.com/nasser/Socket)
-The message we send to this socket is actually very simple. We just send what
-we want to compile and add this \n\004\n.
-
-
 ## Future Work
 
   * Snippets
-  * Feed line/Feed region
   * Formatting
-  * Killing at close ozengine/ozemulator(on Unix like)/ozwish(if Browse is used)
-  * Redirect compilation and emulator output.
 
 ## Contributing
 
