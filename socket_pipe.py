@@ -1,8 +1,8 @@
-# Inspired from
-# Copyright :
-# Ramsey Nasser 2016. Provided under the MIT License
-# see https://github.com/nassar/Socket
-#
+# Code in this file is derivative of
+# https://github.com/nasser/Socket
+# Copyright (c) 2016 Ramsey Nasser
+# https://opensource.org/licenses/MIT
+
 # Last Change :
 # Andres Zarza 2018
 
