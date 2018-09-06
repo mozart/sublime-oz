@@ -1,0 +1,6 @@
+[
+	{
+		"caption": "Oz: Halt compiler",
+		"command": "oz_kill"
+	}
+]

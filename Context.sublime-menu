@@ -1,0 +1,8 @@
+[
+    { "caption": "-", "id": "Oz feed" },
+    {
+        "caption": "Oz: Feed to Compiler",
+        "command": "oz_feed_context",
+        "mnemonic": "F"
+    }
+]
