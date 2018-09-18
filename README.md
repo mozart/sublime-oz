@@ -9,6 +9,10 @@
   * OPI Integration - Submit current line/selection/file to the Oz compiler.
     * Still a work in progress. Killing subprocesses does not work reliably.
 
+## Preview
+
+![Screenshot](https://raw.githubusercontent.com/mozart/sublime-oz/master/screenshot.png)
+
 ## Installation
 
 Sublime/Oz is available from [Package Control](https://packagecontrol.io/packages/Oz) under the name `Oz`.
