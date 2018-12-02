@@ -17,7 +17,7 @@
 
 Sublime/Oz is available from [Package Control](https://packagecontrol.io/packages/Oz) under the name `Oz`.
 
-In order to build and run Oz code, the Oz compiler will need to be installed separately.
+In order to build and run Oz code, the Oz compiler will need to be installed separately. The `ozc` and `ozengine` binaries will have to be included in your `PATH` variable.
 
 ## Usage
 
