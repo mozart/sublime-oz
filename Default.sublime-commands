@@ -1,6 +1,7 @@
 [
-	{
-		"caption": "Oz: Halt compiler",
-		"command": "oz_kill"
-	}
+  {
+    "caption": "Oz: Halt compiler",
+    "command": "oz_kill",
+    "context": [{ "key": "selector", "operator": "equal", "operand": "source.oz" }]
+  }
 ]

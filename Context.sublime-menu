@@ -1,8 +1,13 @@
 [
-    { "caption": "-", "id": "Oz feed" },
-    {
-        "caption": "Oz: Feed to Compiler",
-        "command": "oz_feed_context",
-        "mnemonic": "F"
-    }
+  {
+    "caption": "-",
+    "id": "Oz feed",
+    "context": [{ "key": "selector", "operator": "equal", "operand": "source.oz" }]
+  },
+  {
+    "caption": "Oz: Feed to Compiler",
+    "command": "oz_feed_context",
+    "mnemonic": "F",
+    "context": [{ "key": "selector", "operator": "equal", "operand": "source.oz" }]
+  }
 ]

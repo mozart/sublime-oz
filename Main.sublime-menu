@@ -1,30 +1,30 @@
 [
-    {
-        "caption": "Oz",
-        "mnemonic": "O",
-        "id": "oz-menu",
-        "children":
-        [
-            {
-                "caption": "Halt Oz",
-                "command": "oz_kill"
-            },
-            { "caption": "-", "id": "feed" },
-            {
-                "caption": "Feed Line",
-                "command": "oz_feed_line",
-                "mnemonic": "L"
-            },
-            {
-                "caption": "Feed Selection",
-                "command": "oz_feed_region",
-                "mnemonic": "S"
-            },
-            {
-                "caption": "Feed File",
-                "command": "oz_feed_buffer",
-                "mnemonic": "F"
-            },
-        ]
-    }
+  {
+    "caption": "Oz",
+    "mnemonic": "O",
+    "id": "oz-menu",
+    "context": [{ "key": "selector", "operator": "equal", "operand": "source.oz" }],
+    "children": [
+      {
+        "caption": "Halt Oz",
+        "command": "oz_kill"
+      },
+      { "caption": "-", "id": "feed" },
+      {
+        "caption": "Feed Line",
+        "command": "oz_feed_line",
+        "mnemonic": "L"
+      },
+      {
+        "caption": "Feed Selection",
+        "command": "oz_feed_region",
+        "mnemonic": "S"
+      },
+      {
+        "caption": "Feed File",
+        "command": "oz_feed_buffer",
+        "mnemonic": "F"
+      },
+    ]
+  }
 ]
